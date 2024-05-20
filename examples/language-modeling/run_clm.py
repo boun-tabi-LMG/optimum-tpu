@@ -368,22 +368,30 @@ def main():
             streaming=data_args.streaming,
         )
         if "validation" not in raw_datasets.keys():
-            raw_datasets["validation"] = load_dataset(
-                data_args.dataset_name,
-                data_args.dataset_config_name,
-                split=f"train[:{data_args.validation_split_percentage}%]",
-                cache_dir=model_args.cache_dir,
-                token=model_args.token,
-                streaming=data_args.streaming,
+            # n_train_samples = len(raw_datasets["train"])
+            n_train_samples = 50336214
+            raw_datasets["train"] = raw_datasets["train"].skip(
+                round(n_train_samples * float(data_args.validation_split_percentage) / 100)
             )
-            raw_datasets["train"] = load_dataset(
-                data_args.dataset_name,
-                data_args.dataset_config_name,
-                split=f"train[{data_args.validation_split_percentage}%:]",
-                cache_dir=model_args.cache_dir,
-                token=model_args.token,
-                streaming=data_args.streaming,
+            raw_datasets["validation"] = raw_datasets["train"].take(
+                round(n_train_samples * float(data_args.validation_split_percentage) / 100)
             )
+            # raw_datasets["validation"] = load_dataset(
+            #     data_args.dataset_name,
+            #     data_args.dataset_config_name,
+            #     split=f"train[:{data_args.validation_split_percentage}%]",
+            #     cache_dir=model_args.cache_dir,
+            #     token=model_args.token,
+            #     streaming=data_args.streaming,
+            # )
+            # raw_datasets["train"] = load_dataset(
+            #     data_args.dataset_name,
+            #     data_args.dataset_config_name,
+            #     split=f"train[{data_args.validation_split_percentage}%:]",
+            #     cache_dir=model_args.cache_dir,
+            #     token=model_args.token,
+            #     streaming=data_args.streaming,
+            # )
     else:
         data_files = {}
         dataset_args = {}

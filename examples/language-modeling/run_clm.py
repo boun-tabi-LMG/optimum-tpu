@@ -745,7 +745,10 @@ def main():
         max_train_samples = (
             data_args.max_train_samples if data_args.max_train_samples is not None else len(train_dataset)
         )
-        metrics["train_samples"] = min(max_train_samples, len(train_dataset))
+        if data_args.streaming is not True:
+            metrics["train_samples"] = min(max_train_samples, len(train_dataset))
+        else:
+            metrics["train_samples"] = min(max_train_samples, 50336214)
 
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)

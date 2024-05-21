@@ -760,8 +760,14 @@ def main():
 
         metrics = trainer.evaluate()
 
-        max_eval_samples = data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
-        metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
+        if data_args.streaming is not True:
+            max_eval_samples = (
+                data_args.max_eval_samples if data_args.max_eval_samples is not None else len(eval_dataset)
+            )
+            metrics["eval_samples"] = min(max_eval_samples, len(eval_dataset))
+        else:
+            max_eval_samples = round(float(data_args.validation_split_percentage) / 100 * 50336214)
+            metrics["eval_samples"] = max_eval_samples
         try:
             perplexity = math.exp(metrics["eval_loss"])
         except OverflowError:
